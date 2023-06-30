@@ -1,10 +1,10 @@
 # dev, builder
-FROM golang:1.16 AS golang
+FROM golang:1.18 AS golang
 WORKDIR /work/yatter-backend-go
 
 # dev
 FROM golang as dev
-RUN curl -sSfL https://raw.githubusercontent.com/cosmtrek/air/master/install.sh | sh -s -- -b $(go env GOPATH)/bin
+RUN go install github.com/cosmtrek/air@latest
 
 # builder
 FROM golang AS builder
