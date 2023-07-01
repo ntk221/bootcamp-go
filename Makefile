@@ -41,4 +41,18 @@ vet:
 clean:
 	git clean -f -X app bin build
 
+
+up:
+	docker compose up -d
+
+down:
+	docker compose down
+
+log:
+	docker compose logs
+
+log-web:
+	docker compose logs web
+
+
 .PHONY:	test clean
