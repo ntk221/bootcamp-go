@@ -49,7 +49,7 @@ down:
 	docker compose down
 
 log:
-	docker compose logs
+	docker compose logs -f
 
 log-web:
 	docker compose logs web

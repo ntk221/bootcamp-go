@@ -9,6 +9,7 @@ import (
 
 type (
 	AccountID    = int64
+	StatusID     = int64
 	PasswordHash = string
 
 	// Account account
@@ -36,6 +37,15 @@ type (
 
 		// The time the account was created
 		CreateAt DateTime `json:"create_at,omitempty" db:"create_at"`
+
+		Statuses []*Status `json:"statuses,omitempty"`
+	}
+
+	Status struct {
+		ID        StatusID  `json:"id"`
+		AccountID AccountID `json:"account_id"`
+		Content   string    `json:"content"`
+		Posted    bool
 	}
 )
 
@@ -60,4 +70,30 @@ func generatePasswordHash(pass string) (PasswordHash, error) {
 		return "", fmt.Errorf("hashing password failed: %w", errors.WithStack(err))
 	}
 	return PasswordHash(hash), nil
+}
+
+func CreateStatus(accountID AccountID, content string) (*Status, error) {
+	// TODO: validation?
+
+	return &Status{
+		AccountID: accountID,
+		Content:   content,
+		Posted:    false,
+	}, nil
+}
+
+func (a *Account) SetStatus(content string) error {
+	status, err := CreateStatus(a.ID, content)
+	if err != nil {
+		return err
+	}
+	a.Statuses = append(a.Statuses, status)
+	return nil
+}
+
+func (a *Account) GetStatuses() ([]*Status, error) {
+	if len(a.Statuses) == 0 {
+		return nil, errors.New("no status")
+	}
+	return a.Statuses, nil
 }

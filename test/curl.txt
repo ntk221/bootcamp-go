@@ -1,0 +1,11 @@
+curl -X POST \                                                                []
+  -H "accept: application/json" \
+  -H "Content-Type: application/json" \
+  -H "Authentication: username john" \
+  -d '{
+    "status": "ピタ ゴラ スイッチ♪",
+    "media_ids": [0]
+  }' \
+  http://localhost:8080/v1/statuses
+
+
