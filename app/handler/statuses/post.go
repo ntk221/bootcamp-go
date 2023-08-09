@@ -10,12 +10,14 @@ import (
 	"yatter-backend-go/app/handler/httperror"
 )
 
+// AddRequest
 // Request body for `POST /v1/accounts`
 type AddRequest struct {
-	Status    string
-	Media_IDs []int
+	Status   string
+	MediaIDs []int
 }
 
+// Post
 // Handle request for `POST /v1/statuses`
 func (h *handler) Post(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()

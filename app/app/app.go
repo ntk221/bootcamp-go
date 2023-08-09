@@ -5,11 +5,13 @@ import (
 	"yatter-backend-go/app/dao"
 )
 
+// App
 // Dependency manager for whole application
 type App struct {
 	Dao dao.Dao
 }
 
+// NewApp
 // Create dependency manager
 func NewApp() (*App, error) {
 	// panic if lacking something
