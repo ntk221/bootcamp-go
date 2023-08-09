@@ -51,34 +51,3 @@ func (r *account) CreateUser(ctx context.Context, account *object.Account) error
 
 	return nil
 }
-
-func (r *account) PostStatus(ctx context.Context, account *object.Account) error {
-	statuses, err := account.GetStatuses()
-	if err != nil {
-		return fmt.Errorf("%w", err)
-	}
-
-	yetPosted := make([]*object.Status, 0)
-	for _, status := range statuses {
-		if !status.Posted {
-			yetPosted = append(yetPosted, status)
-			status.Posted = true
-		}
-	}
-
-	if len(yetPosted) == 0 {
-		return errors.New("no status")
-	}
-
-	for _, status := range yetPosted {
-		_, err := r.db.ExecContext(ctx, "insert into status (account_id, content) values (?, ?)",
-			status.AccountID,
-			status.Content,
-		)
-		if err != nil {
-			return fmt.Errorf("%w", err)
-		}
-	}
-
-	return nil
-}

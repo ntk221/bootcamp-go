@@ -37,7 +37,7 @@ type (
 		// The time the account was created
 		CreateAt DateTime `json:"create_at,omitempty" db:"create_at"`
 
-		Statuses []*Status `json:"statuses,omitempty"`
+		// Statuses []*Status `json:"statuses,omitempty"`
 	}
 )
 
@@ -66,12 +66,12 @@ func generatePasswordHash(pass string) (PasswordHash, error) {
 	return PasswordHash(hash), nil
 }
 
-func (a *Account) SetStatus(content string) error {
+/*func (a *Account) SetStatus(content string) error {
 	status, err := CreateStatus(a.ID, content)
 	if err != nil {
 		return err
 	}
-	a.Statuses = append(a.Statuses, status)
+	a.Statuses = append(a.Statuses, &status)
 	return nil
 }
 
@@ -80,4 +80,4 @@ func (a *Account) GetStatuses() ([]*Status, error) {
 		return nil, errors.New("no status")
 	}
 	return a.Statuses, nil
-}
+}*/

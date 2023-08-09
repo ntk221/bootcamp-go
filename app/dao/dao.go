@@ -46,7 +46,7 @@ func (d *dao) Account() repository.Account {
 
 func (d *dao) Status() repository.Status {
 	//TODO implement me
-	panic("implement me")
+	return NewStatus(d.db)
 }
 
 func (d *dao) InitAll() error {

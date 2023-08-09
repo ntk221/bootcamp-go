@@ -13,8 +13,8 @@ import (
 // PostRequest
 // Request body for `POST /v1/statuses`
 type PostRequest struct {
-	StatusContent string
-	MediaIDs      []int
+	Status   string
+	MediaIDs []int
 }
 
 // PostResponse
@@ -38,16 +38,16 @@ func (h *handler) Post(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Printf("req: %+v", req)
+	// log.Printf("req: %+v", req)
 
 	account := auth.AccountOf(r)
 	accountID := account.ID
-	content := req.StatusContent
+	content := req.Status
+	log.Printf("content: %v", content)
 	status, err := object.CreateStatus(accountID, content)
 	if err != nil {
 		httperror.InternalServerError(w, err)
 	}
-
 	statusRepo := h.app.Dao.Status()
 
 	posted, err := statusRepo.PostStatus(ctx, status)
