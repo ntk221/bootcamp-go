@@ -3,9 +3,8 @@ curl -X POST \                                                                []
   -H "Content-Type: application/json" \
   -H "Authentication: username john" \
   -d '{
-    "status": "ピタ ゴラ スイッチ♪",
+    "status": "TEST DESU!",
     "media_ids": [0]
   }' \
   http://localhost:8080/v1/statuses
-
 

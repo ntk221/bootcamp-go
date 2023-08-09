@@ -11,9 +11,15 @@ import (
 type (
 	// DAO interface
 	Dao interface {
+		// Account
 		// Get account repository
 		Account() repository.Account
 
+		// Status
+		// Get status repository
+		Status() repository.Status
+
+		// InitAll
 		// Clear all data in DB
 		InitAll() error
 	}
@@ -36,6 +42,11 @@ func New(config DBConfig) (Dao, error) {
 
 func (d *dao) Account() repository.Account {
 	return NewAccount(d.db)
+}
+
+func (d *dao) Status() repository.Status {
+	//TODO implement me
+	panic("implement me")
 }
 
 func (d *dao) InitAll() error {

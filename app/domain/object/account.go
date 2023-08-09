@@ -12,7 +12,6 @@ type (
 	StatusID     = int64
 	PasswordHash = string
 
-	// Account account
 	Account struct {
 		// The internal ID of the account
 		ID AccountID `json:"-"`
@@ -40,21 +39,16 @@ type (
 
 		Statuses []*Status `json:"statuses,omitempty"`
 	}
-
-	Status struct {
-		ID        StatusID  `json:"id"`
-		AccountID AccountID `json:"account_id"`
-		Content   string    `json:"content"`
-		Posted    bool
-	}
 )
 
+// CheckPassword
 // Check if given password is match to account's password
 func (a *Account) CheckPassword(pass string) bool {
 	return bcrypt.CompareHashAndPassword([]byte(a.PasswordHash), []byte(pass)) == nil
 }
 
-// Hash password and set it to account object
+// SetPassword
+// ash password and set it to account object
 func (a *Account) SetPassword(pass string) error {
 	passwordHash, err := generatePasswordHash(pass)
 	if err != nil {
@@ -70,16 +64,6 @@ func generatePasswordHash(pass string) (PasswordHash, error) {
 		return "", fmt.Errorf("hashing password failed: %w", errors.WithStack(err))
 	}
 	return PasswordHash(hash), nil
-}
-
-func CreateStatus(accountID AccountID, content string) (*Status, error) {
-	// TODO: validation?
-
-	return &Status{
-		AccountID: accountID,
-		Content:   content,
-		Posted:    false,
-	}, nil
 }
 
 func (a *Account) SetStatus(content string) error {

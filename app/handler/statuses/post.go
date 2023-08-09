@@ -2,19 +2,29 @@ package status
 
 import (
 	"encoding/json"
-	"errors"
 	"log"
 	"net/http"
+	"yatter-backend-go/app/domain/object"
 
 	"yatter-backend-go/app/handler/auth"
 	"yatter-backend-go/app/handler/httperror"
 )
 
-// AddRequest
-// Request body for `POST /v1/accounts`
-type AddRequest struct {
-	Status   string
-	MediaIDs []int
+// PostRequest
+// Request body for `POST /v1/statuses`
+type PostRequest struct {
+	StatusContent string
+	MediaIDs      []int
+}
+
+// PostResponse
+// Response body for `POST /v1/statuses`
+type PostResponse struct {
+	ID              object.StatusID
+	Account         object.Account
+	Content         string
+	CreateAt        object.DateTime
+	MediaAttachment []string // 仮実装
 }
 
 // Post
@@ -22,7 +32,7 @@ type AddRequest struct {
 func (h *handler) Post(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	var req AddRequest
+	var req PostRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		httperror.BadRequest(w, err)
 		return
@@ -31,24 +41,30 @@ func (h *handler) Post(w http.ResponseWriter, r *http.Request) {
 	log.Printf("req: %+v", req)
 
 	account := auth.AccountOf(r)
-	err := account.SetStatus(req.Status)
+	accountID := account.ID
+	content := req.StatusContent
+	status, err := object.CreateStatus(accountID, content)
 	if err != nil {
-		httperror.InternalServerError(w, errors.New("failed to set status"))
-		return
+		httperror.InternalServerError(w, err)
 	}
 
-	log.Printf("account: %+v", account)
+	statusRepo := h.app.Dao.Status()
 
-	accountRepo := h.app.Dao.Account() // domain/repository の取得
-
-	err = accountRepo.PostStatus(ctx, account)
+	posted, err := statusRepo.PostStatus(ctx, status)
 	if err != nil {
-		httperror.InternalServerError(w, errors.New("failed to post status"))
-		return
+		httperror.InternalServerError(w, err)
+	}
+
+	response := PostResponse{
+		ID:              posted.ID,
+		Account:         *account,
+		Content:         posted.Content,
+		CreateAt:        posted.CreateAt,
+		MediaAttachment: []string{}, // 仮実装
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(account); err != nil {
+	if err := json.NewEncoder(w).Encode(response); err != nil {
 		httperror.InternalServerError(w, err)
 		return
 	}
