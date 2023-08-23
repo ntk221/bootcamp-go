@@ -14,20 +14,20 @@ import (
 
 type (
 	// Implementation for repository.Account
-	account struct {
+	accountRepositoryImpl struct {
 		db *sqlx.DB
 	}
 )
 
 // NewAccount : Create accout repository
 func NewAccount(db *sqlx.DB) repository.Account {
-	return &account{db: db}
+	return &accountRepositoryImpl{db: db}
 }
 
 // FindByUsername : ユーザ名からユーザを取得
-func (r *account) FindByUsername(ctx context.Context, username string) (*object.Account, error) {
+func (ar *accountRepositoryImpl) FindByUsername(ctx context.Context, username string) (*object.Account, error) {
 	entity := new(object.Account)
-	err := r.db.QueryRowxContext(ctx, "select * from account where username = ?", username).StructScan(entity)
+	err := ar.db.QueryRowxContext(ctx, "select * from account where username = ?", username).StructScan(entity)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, nil
@@ -39,8 +39,8 @@ func (r *account) FindByUsername(ctx context.Context, username string) (*object.
 	return entity, nil
 }
 
-func (r *account) CreateUser(ctx context.Context, account *object.Account) error {
-	_, err := r.db.ExecContext(ctx, "insert into account (username, password_hash) values (?, ?)",
+func (ar *accountRepositoryImpl) CreateUser(ctx context.Context, account *object.Account) error {
+	_, err := ar.db.ExecContext(ctx, "insert into account (username, password_hash) values (?, ?)",
 		account.Username,
 		account.PasswordHash,
 	)
@@ -50,4 +50,18 @@ func (r *account) CreateUser(ctx context.Context, account *object.Account) error
 	}
 
 	return nil
+}
+
+func (ar *accountRepositoryImpl) FindByID(ctx context.Context, userID object.AccountID) (*object.Account, error) {
+	entity := new(object.Account)
+	err := ar.db.QueryRowxContext(ctx, "select * from account where id = ?", userID).StructScan(entity)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, nil
+		}
+
+		return nil, fmt.Errorf("%w", err)
+	}
+
+	return entity, nil
 }
