@@ -2,6 +2,8 @@ package accounts
 
 import (
 	"encoding/json"
+	"errors"
+	"log"
 	"net/http"
 
 	"yatter-backend-go/app/domain/object"
@@ -24,12 +26,14 @@ func (h *handler) GetAccount(w http.ResponseWriter, r *http.Request) {
 
 	account, err := accountRepo.FindByUsername(ctx, account.Username)
 	if err != nil {
-		httperror.InternalServerError(w, err)
+		log.Println(err)
+		httperror.BadRequest(w, errors.New("指定されたidのstatusにはユーザーが見つかりませんでした"))
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(account); err != nil {
+		log.Println(err)
 		httperror.InternalServerError(w, err)
 		return
 	}

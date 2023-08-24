@@ -2,6 +2,7 @@ package status
 
 import (
 	"encoding/json"
+	"errors"
 	"log"
 	"net/http"
 	"yatter-backend-go/app/domain/object"
@@ -34,6 +35,7 @@ func (h *handler) Post(w http.ResponseWriter, r *http.Request) {
 
 	var req PostRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		log.Println(err)
 		httperror.BadRequest(w, err)
 		return
 	}
@@ -46,12 +48,14 @@ func (h *handler) Post(w http.ResponseWriter, r *http.Request) {
 	log.Printf("content: %v", content)
 	status, err := object.CreateStatus(accountID, content)
 	if err != nil {
+		log.Println(err)
 		httperror.InternalServerError(w, err)
 	}
 	statusRepo := h.app.Dao.Status()
 
 	posted, err := statusRepo.PostStatus(ctx, status)
 	if err != nil {
+		log.Println(err)
 		httperror.InternalServerError(w, err)
 	}
 
@@ -65,7 +69,8 @@ func (h *handler) Post(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(response); err != nil {
-		httperror.InternalServerError(w, err)
+		log.Println(err)
+		httperror.InternalServerError(w, errors.New("サーバー側でなんらかの問題が発生しました"))
 		return
 	}
 }
