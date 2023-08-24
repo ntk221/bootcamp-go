@@ -3,10 +3,8 @@ package status
 import (
 	"net/http"
 
-	"yatter-backend-go/app/app"
-	"yatter-backend-go/app/handler/auth"
-
 	"github.com/go-chi/chi"
+	"yatter-backend-go/app/app"
 )
 
 // Implementation of handler
@@ -18,7 +16,7 @@ type handler struct {
 func NewRouter(app *app.App) http.Handler {
 	r := chi.NewRouter()
 
-	r.Use(auth.Middleware(app))
+	// r.Use(auth.Middleware(app))
 
 	h := &handler{app: app}
 	r.Post("/", h.Post)

@@ -74,3 +74,44 @@ func (s *statusRepositoryImpl) FindStatusByID(ctx context.Context, statusID obje
 
 	return entity, nil
 }
+
+func (s *statusRepositoryImpl) DeleteStatusByID(ctx context.Context, statusID object.StatusID) error {
+	query := `
+		DELETE FROM status WHERE id = ?
+	`
+
+	_, err := s.db.ExecContext(ctx, query, statusID)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+
+	return nil
+}
+
+func (s *statusRepositoryImpl) GetStatusesByParams(ctx context.Context, maxID, sinceID, limit int) (*object.StatusCollection, error) {
+	sc := object.NewStatusCollection([]object.Status{})
+
+	query := `
+        SELECT * FROM status
+        WHERE id < ? AND id > ?
+        LIMIT ?
+    `
+
+	rows, err := s.db.QueryxContext(ctx, query, maxID, sinceID, limit)
+	if err != nil {
+		log.Println(err)
+		return &object.StatusCollection{}, err
+	}
+	for rows.Next() {
+		status := object.Status{}
+		err := rows.StructScan(&status)
+		if err != nil {
+			log.Println(err)
+			return &object.StatusCollection{}, err
+		}
+		sc = sc.AddStatus(status)
+	}
+
+	return sc, nil
+}
